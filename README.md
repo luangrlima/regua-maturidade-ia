@@ -1,5 +1,7 @@
 # Régua de maturidade em IA
 
+**→ https://regua-maturidade-ia.pages.dev**
+
 Diagnóstico de maturidade no uso de IA no trabalho. Oito perguntas de escolha, escala única
 N0–N6, sem bifurcação por papel. O resultado sai na hora, no navegador de quem responde.
 
@@ -88,20 +90,25 @@ O fixture `tests/casos-reais.json` (respostas internas anonimizadas) não é ver
 presente, o teste de score também confere a paridade contra os registros reais; quando ausente,
 essa etapa é pulada.
 
-## Publicar no Cloudflare Pages
+## Publicar
 
-Site estático, sem build.
+Site estático, sem build. Só três arquivos vão ao ar: `index.html`, `app.js` e `_headers`.
 
-1. Suba este repositório para o GitHub.
-2. No painel do Cloudflare: **Workers & Pages → Create → Pages → Connect to Git** e escolha o repositório.
-3. Configuração de build:
-   - **Framework preset:** None
-   - **Build command:** deixe vazio
-   - **Build output directory:** `/`
-4. **Save and Deploy.** A URL provisória sai como `https://<projeto>.pages.dev`.
+```bash
+npx wrangler login
+mkdir -p dist && cp index.html app.js _headers dist/
+npx wrangler pages deploy dist --project-name regua-maturidade-ia --branch main
+```
 
-Cada push na branch principal republica. O arquivo `_headers` aplica uma CSP restritiva —
-a página não carrega nada de fora, então nada quebra.
+O `dist/` existe para que `tests/`, `node_modules/` e o fixture de respostas reais nunca
+subam junto — o wrangler publica o diretório inteiro que recebe.
+
+O arquivo `_headers` aplica a CSP em produção. Como a página não carrega absolutamente
+nada de fora — nem fonte, nem ícone, nem analytics — a política pode ser restritiva ao
+extremo: `default-src 'none'`.
+
+Para republicar a cada push, conecte o repositório em **Workers & Pages → o projeto →
+Settings → Builds → Connect to Git**, com build command vazio e output directory `/`.
 
 ## Limites do instrumento
 

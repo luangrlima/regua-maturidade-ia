@@ -4,3 +4,16 @@ package-lock.json
 tests/casos-reais.json
 *.png
 .DS_Store
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
+
+# artefatos locais de build e deploy
+dist/
+.wrangler/
+wrangler.jsonc
+wrangler.toml
