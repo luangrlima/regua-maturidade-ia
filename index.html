@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Régua de maturidade em IA</title>
+<meta name="description" content="Diagnóstico de maturidade em IA. Nove perguntas, escala N0–N6. O resultado sai na hora, no seu navegador. Nada é enviado nem salvo.">
+<meta property="og:title" content="Régua de maturidade em IA">
+<meta property="og:description" content="Nove perguntas. O seu nível de N0 a N6, a trava que segurou e o que destravar. Nada é enviado nem salvo.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f5f5f7'/><rect x='14' y='42' width='72' height='7' fill='%231d1d1f'/><rect x='14' y='60' width='44' height='7' fill='%230066cc'/></svg>">
+<style>
+:root{
+  --ink:#1d1d1f; --ink-80:#333333; --ink-48:#7a7a7a; --muted:#6e6e73;
+  --canvas:#ffffff; --parchment:#f5f5f7; --pearl:#fafafc;
+  --hairline:#e0e0e0; --divider:#f0f0f0; --chip:#d2d2d7;
+  --primary:#0066cc; --primary-focus:#0071e3; --on-primary:#ffffff;
+  --ochre:#8a6d1f; --oxide:#9a3412;
+  --sans:"SF Pro Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --display:"SF Pro Display",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --xxs:4px; --xs:8px; --sm:12px; --md:17px; --lg:24px; --xl:32px; --xxl:48px; --section:80px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--parchment); color:var(--ink);
+  font-family:var(--sans); font-size:17px; line-height:1.47; letter-spacing:-0.374px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:760px; margin:0 auto; padding:0 24px}
+a{color:var(--primary); text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ---------- topo ---------- */
+header{padding:72px 0 40px}
+.overline{
+  font-size:13px; font-weight:600; letter-spacing:2.4px; text-transform:uppercase;
+  color:var(--muted); margin:0 0 20px
+}
+h1{
+  font-family:var(--display); font-size:clamp(38px,7vw,56px); font-weight:600;
+  line-height:1.07; letter-spacing:-1.4px; margin:0 0 var(--md)
+}
+.lead{
+  font-family:var(--display); font-size:clamp(19px,2.6vw,24px); font-weight:400;
+  line-height:1.4; letter-spacing:0; color:var(--ink-80); margin:0 0 var(--lg); max-width:34em
+}
+.notice{
+  font-size:15px; line-height:1.5; color:var(--muted); letter-spacing:-0.2px;
+  border-left:2px solid var(--chip); padding-left:16px; margin:0; max-width:40em
+}
+.notice strong{color:var(--ink-80); font-weight:600}
+
+/* ---------- progresso ---------- */
+.progress{
+  position:sticky; top:0; z-index:20; background:rgba(245,245,247,.82);
+  -webkit-backdrop-filter:saturate(180%) blur(20px); backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--hairline); margin-bottom:var(--xxl)
+}
+.progress-in{
+  max-width:760px; margin:0 auto; padding:13px 24px;
+  display:flex; align-items:center; gap:16px;
+  font-size:14px; letter-spacing:-0.224px; color:var(--muted)
+}
+.progress-track{display:block; flex:1; height:3px; background:var(--chip); border-radius:9999px; overflow:hidden}
+.progress-fill{display:block; height:100%; width:0%; background:var(--primary); transition:width .35s cubic-bezier(.4,0,.2,1)}
+.progress-count{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:600; color:var(--ink-80)}
+
+/* ---------- perguntas ---------- */
+.q{
+  background:var(--canvas); border-radius:18px; padding:var(--xl);
+  margin-bottom:var(--lg); scroll-margin-top:80px
+}
+@media(max-width:600px){ .q{padding:22px 20px; border-radius:14px} }
+.q-tag{
+  display:inline-flex; align-items:center; gap:8px; margin-bottom:14px;
+  font-size:12px; font-weight:600; letter-spacing:1.6px; text-transform:uppercase; color:var(--muted)
+}
+.q-tag .n{
+  background:var(--parchment); color:var(--ink-80); border-radius:9999px;
+  padding:3px 10px; letter-spacing:.6px
+}
+.q-tag .w{color:var(--primary); letter-spacing:1.2px}
+.q h2{
+  font-family:var(--display); font-size:clamp(22px,3.2vw,28px); font-weight:600;
+  line-height:1.2; letter-spacing:-0.7px; margin:0 0 10px
+}
+.q .hint{font-size:15px; color:var(--muted); line-height:1.5; margin:0 0 var(--lg); letter-spacing:-0.2px}
+.opts{display:flex; flex-direction:column; gap:10px}
+.opt{
+  display:flex; gap:14px; align-items:flex-start; cursor:pointer;
+  border:1px solid var(--hairline); border-radius:11px; padding:15px 17px;
+  background:var(--canvas); transition:border-color .15s, background .15s;
+}
+.opt:hover{border-color:var(--chip); background:var(--pearl)}
+.opt input{position:absolute; opacity:0; width:0; height:0}
+.dot{
+  flex:none; width:20px; height:20px; margin-top:2px; border-radius:9999px;
+  border:1.5px solid var(--chip); background:var(--canvas); transition:border-color .15s;
+  display:grid; place-items:center
+}
+.dot::after{content:""; width:9px; height:9px; border-radius:9999px; background:var(--on-primary); transform:scale(0); transition:transform .15s}
+.opt.box .dot{border-radius:6px}
+.opt[data-on="1"]{border-color:var(--primary); background:var(--pearl)}
+.opt[data-on="1"] .dot{border-color:var(--primary); background:var(--primary)}
+.opt[data-on="1"] .dot::after{transform:scale(1)}
+.opt:focus-within{outline:2px solid var(--primary-focus); outline-offset:2px}
+.opt .txt{min-width:0}
+.opt .code{
+  font-size:12px; font-weight:600; letter-spacing:.8px; color:var(--muted);
+  display:block; margin-bottom:3px
+}
+.opt[data-on="1"] .code{color:var(--primary)}
+.opt .main{font-size:16px; line-height:1.42; letter-spacing:-0.3px}
+.opt .eg{display:block; margin-top:5px; font-size:14px; line-height:1.45; color:var(--muted); letter-spacing:-0.2px}
+.q.missing{box-shadow:0 0 0 2px var(--oxide)}
+.q-warn{display:none; margin-top:14px; font-size:14px; color:var(--oxide); font-weight:600}
+.q.missing .q-warn{display:block}
+
+/* ---------- glossário ---------- */
+details.gloss{background:var(--canvas); border-radius:18px; padding:var(--lg) var(--xl); margin-bottom:var(--lg)}
+details.gloss summary{cursor:pointer; font-weight:600; font-size:17px; letter-spacing:-0.374px; list-style:none}
+details.gloss summary::-webkit-details-marker{display:none}
+details.gloss summary::after{content:" ›"; color:var(--muted)}
+details.gloss[open] summary::after{content:" ⌄"}
+details.gloss dl{margin:var(--md) 0 0; font-size:15px; line-height:1.5}
+details.gloss dt{font-weight:600; margin-top:14px}
+details.gloss dd{margin:2px 0 0; color:var(--muted)}
+
+/* ---------- botão ---------- */
+.actions{padding:var(--xs) 0 var(--section); text-align:center}
+.btn{
+  font-family:var(--sans); font-size:18px; font-weight:400; letter-spacing:0;
+  background:var(--primary); color:var(--on-primary); border:0; border-radius:9999px;
+  padding:15px 34px; cursor:pointer; transition:background .15s
+}
+.btn:hover{background:var(--primary-focus)}
+.btn:focus-visible{outline:2px solid var(--primary-focus); outline-offset:3px}
+.btn.ghost{background:transparent; color:var(--primary); font-size:17px; padding:12px 20px}
+.btn.ghost:hover{background:var(--divider)}
+.btn[disabled]{opacity:.35; cursor:not-allowed}
+.actions .sub{margin-top:14px; font-size:14px; color:var(--muted)}
+
+/* ---------- resultado ---------- */
+#result{display:none}
+#result.on{display:block}
+.res-hero{padding:64px 0 var(--xl); border-bottom:1px solid var(--hairline); margin-bottom:var(--xl)}
+.res-level{
+  font-family:var(--display); font-size:clamp(80px,17vw,132px); font-weight:600;
+  line-height:.92; letter-spacing:-5px; margin:0 0 var(--sm)
+}
+.res-name{
+  font-family:var(--display); font-size:clamp(26px,4.4vw,40px); font-weight:600;
+  line-height:1.1; letter-spacing:-1px; margin:0 0 var(--md)
+}
+.res-def{font-size:19px; line-height:1.5; color:var(--ink-80); margin:0; max-width:36em}
+
+.scale{margin:var(--xl) 0 0}
+.scale-row{display:flex; gap:6px; margin-bottom:10px}
+.scale-cell{
+  flex:1; height:44px; border-radius:8px; background:var(--chip);
+  display:grid; place-items:center; font-size:14px; font-weight:600; color:var(--canvas);
+  letter-spacing:0
+}
+.scale-cell.past{background:var(--ink)}
+.scale-cell.now{background:var(--primary)}
+.scale-cell.future{background:var(--divider); color:var(--ink-48)}
+.scale-cap{font-size:13px; color:var(--muted); display:flex; justify-content:space-between}
+
+h3.sec{
+  font-size:12px; font-weight:600; letter-spacing:2.2px; text-transform:uppercase;
+  color:var(--muted); margin:var(--section) 0 var(--lg)
+}
+.card{background:var(--canvas); border-radius:18px; padding:var(--xl); margin-bottom:var(--md)}
+@media(max-width:600px){ .card{padding:22px 20px; border-radius:14px} }
+.card h4{
+  font-family:var(--display); font-size:22px; font-weight:600; line-height:1.25;
+  letter-spacing:-0.5px; margin:0 0 10px
+}
+.card p{margin:0 0 12px; color:var(--ink-80); line-height:1.5}
+.card p:last-child{margin-bottom:0}
+.card.alert{border-left:3px solid var(--oxide)}
+.card.alert h4{color:var(--oxide)}
+.card.note{border-left:3px solid var(--ochre)}
+.card.good{border-left:3px solid var(--primary)}
+
+/* dimensões */
+.dims{background:var(--canvas); border-radius:18px; padding:var(--xl)}
+@media(max-width:600px){ .dims{padding:22px 20px; border-radius:14px} }
+.dim{display:grid; grid-template-columns:132px 1fr auto; gap:16px; align-items:center; margin-bottom:14px}
+@media(max-width:600px){ .dim{grid-template-columns:104px 1fr auto; gap:10px} }
+.dim:last-child{margin-bottom:0}
+.dim .lbl{font-size:15px; letter-spacing:-0.3px}
+.dim .lbl small{display:block; font-size:12px; color:var(--muted); letter-spacing:0}
+.dim .track{display:block; height:22px; background:var(--divider); border-radius:5px; overflow:hidden}
+.dim .fill{display:block; height:100%; min-width:5px; background:var(--ink); border-radius:5px; transition:width .5s cubic-bezier(.4,0,.2,1)}
+.dim.low .fill{background:var(--primary)}
+.dim .val{display:block; font-size:16px; font-weight:600; font-variant-numeric:tabular-nums; min-width:2.5em; text-align:right}
+
+.sum{
+  display:flex; flex-wrap:wrap; gap:var(--lg); margin-top:var(--lg);
+  padding-top:var(--lg); border-top:1px solid var(--divider)
+}
+.sum div{min-width:120px}
+.sum .k{font-size:12px; text-transform:uppercase; letter-spacing:1.6px; color:var(--muted); margin-bottom:5px}
+.sum .v{font-family:var(--display); font-size:28px; font-weight:600; letter-spacing:-0.6px; font-variant-numeric:tabular-nums}
+
+footer{
+  border-top:1px solid var(--hairline); margin-top:var(--section);
+  padding:var(--xl) 0 var(--section); font-size:14px; color:var(--muted); line-height:1.6
+}
+footer p{margin:0 0 10px}
+.print-only{display:none}
+@media print{
+  .progress,.actions,.print-hide{display:none !important}
+  body{background:#fff}
+  .card,.dims,.q{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<div class="progress print-hide" id="bar" hidden>
+  <div class="progress-in">
+    <span class="progress-count" id="count">0 de 9</span>
+    <span class="progress-track"><span class="progress-fill" id="fill"></span></span>
+  </div>
+</div>
+
+<main class="wrap">
+
+<div id="form-view">
+  <header>
+    <p class="overline">Diagnóstico · escala N0–N6</p>
+    <h1>Régua de maturidade em IA</h1>
+    <p class="lead">Nove perguntas sobre o que você realmente faz — não sobre o que você acha que domina. O resultado sai na hora.</p>
+    <p class="notice">
+      <strong>Não é avaliação de desempenho.</strong> Não existe nível bom nem ruim: existe o seu nível hoje. O valor do exercício depende de você marcar o que realmente acontece, não o que soa melhor. Um nível baixo honesto é mais útil que um nível alto otimista.<br><br>
+      <strong>Nada sai do seu navegador.</strong> Não há envio, não há servidor, não há cookie. Fechou a aba, acabou.<br><br>
+      Se você não usa IA no trabalho, responda mesmo assim: todas as perguntas têm a opção que descreve isso, e leva menos de dois minutos.
+    </p>
+  </header>
+
+  <details class="gloss">
+    <summary>Glossário — cinco termos que aparecem nas alternativas</summary>
+    <dl>
+      <dt>Agente</dt>
+      <dd>A IA executando vários passos em sequência por conta própria — planejar, buscar, produzir, conferir — em vez de responder uma pergunta por vez.</dd>
+      <dt>Contexto ou regras</dt>
+      <dd>Um material que a IA lê sempre antes de trabalhar, dizendo como as coisas funcionam aqui. Em código, um arquivo no repositório (CLAUDE.md, AGENTS.md). Fora de código, um doc de padrões, um projeto customizado no ChatGPT ou Claude, ou uma base conectada.</dd>
+      <dt>Repositório</dt>
+      <dd>O lugar onde o material oficial do projeto fica guardado com histórico. Para código é o Git; fora de código, a pasta do Drive ou o espaço do Notion onde vive a versão que vale.</dd>
+      <dt>Teste automatizado</dt>
+      <dd>Um mecanismo que confere o resultado sozinho, sempre do mesmo jeito, e diz se passou. Em código, um programa que testa outro programa. Fora de código, uma rubrica ou checklist de aceite aplicado de forma padronizada.</dd>
+      <dt>Crivo</dt>
+      <dd>Qualquer coisa que confere o resultado antes de você aceitar: teste, rubrica, checklist, revisão cruzada, conferência contra a fonte.</dd>
+    </dl>
+  </details>
+
+  <form id="form" novalidate></form>
+
+  <div class="actions">
+    <button class="btn" id="submit" type="button">Ver o meu resultado</button>
+    <p class="sub" id="submit-sub">O cálculo roda aqui no seu navegador.</p>
+  </div>
+</div>
+
+<section id="result" aria-live="polite"></section>
+
+<footer>
+  <p><strong>Régua de maturidade em IA · v3</strong> — nove perguntas de escolha, escala única N0–N6 sem bifurcação por papel, topo referenciado a critério externo, soma com pesos e quatro limites.</p>
+  <p>Construída sobre Parasuraman, Sheridan &amp; Wickens (2000); Sheridan &amp; Verplank (1978); SAE J3016; Eledath (2026), <em>8 Levels of Agentic Engineering</em>; Google Cloud/DORA (2025); MAILS (Carolus et al., 2023); e a literatura de BARS e vinhetas de ancoragem.</p>
+  <p>Mede comportamento declarado, não capacidade demonstrada. Serve para desenhar trilha e achar gargalo. Não serve para comparar pessoas nem justificar decisão sobre alguém.</p>
+</footer>
+
+</main>
+<script src="app.js"></script>
+</body>
+</html>

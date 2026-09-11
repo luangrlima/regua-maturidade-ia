@@ -1,0 +1,15 @@
+{
+  "name": "regua-maturidade-ia",
+  "version": "1.0.0",
+  "description": "Diagnóstico de maturidade em IA — nove perguntas, escala N0–N6, cálculo no navegador.",
+  "private": true,
+  "scripts": {
+    "test": "node tests/score.test.js && node tests/e2e.test.js && node tests/csp.test.js",
+    "test:score": "node tests/score.test.js",
+    "test:e2e": "node tests/e2e.test.js",
+    "test:csp": "node tests/csp.test.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}
