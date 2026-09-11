@@ -31,9 +31,9 @@ var QUESTIONS = [
    options:[
     {v:1, main:'Nada, ou não uso IA no trabalho.'},
     {v:2, main:'Ficaria o que eu já entreguei, mas ninguém saberia como eu cheguei lá.', eg:'o código, o documento, a análise — e mais nada'},
-    {v:3, main:'Ficariam também os meus prompts e instruções salvos; alguém acharia, mas precisaria de mim para entender.', eg:'uma pasta de prompts, um projeto customizado meu, um doc de anotações'},
+    {v:3, main:'Ficariam os meus prompts e instruções salvos; alguém acharia, mas precisaria de mim para entender.', eg:'uma pasta de prompts, um projeto customizado meu, um doc de anotações'},
     {v:4, main:'Ficaria o mecanismo montado, funcionando e outra pessoa conseguiria usar sem eu explicar.', eg:'as regras no repositório, os testes rodando, a rubrica de aceite, a automação ligada'},
-    {v:5, main:'Além disso, tem coisa minha rodando fora do meu time, usada por gente que eu não conheço.', eg:'repositório público, ferramenta que outro time adotou, material que circula fora daqui'}
+    {v:5, main:'Tem coisa minha rodando fora do meu time, usada por gente que eu não conheço.', eg:'repositório público, ferramenta que outro time adotou, material que circula fora daqui'}
    ]},
 
   {id:'ver', tag:'Verificação', title:'Como você confere',
@@ -43,7 +43,7 @@ var QUESTIONS = [
     {v:2, main:'Leio com atenção e uso o meu julgamento, sem executar nem conferir contra nada.'},
     {v:3, main:'Confiro contra a realidade antes de usar.', eg:'rodo e testo; confiro o número na fonte; confirmo se a citação existe; valido a regra com quem é dono dela'},
     {v:4, main:'Tenho um crivo definido que aplico sempre, cobrindo o que costuma quebrar.', eg:'teste automatizado com casos de borda; rubrica de aceite; revisão cruzada combinada com alguém'},
-    {v:5, main:'Esse crivo roda antes de chegar em mim: a própria IA o executa e só me chama quando passa.'}
+    {v:5, main:'Tenho um crivo definido e ele roda antes de chegar em mim: a própria IA o executa e só me chama quando passa.'}
    ]},
 
   {id:'ctx', tag:'Contexto', title:'O que a IA sabe do seu mundo',
@@ -52,8 +52,8 @@ var QUESTIONS = [
     {v:1, main:'Não fica sabendo, explico do zero a cada conversa, ou não uso IA no trabalho.'},
     {v:2, main:'Colo o contexto à mão em cada tarefa.', eg:'trechos de código, exemplos do padrão esperado, o documento de referência'},
     {v:3, main:'Tenho um contexto escrito e reutilizável que ela lê ou recebe sempre.', eg:'CLAUDE.md ou AGENTS.md no repositório; um doc de padrões; um projeto customizado no ChatGPT ou Claude'},
-    {v:4, main:'Tenho, trabalhei nele neste mês, e criei peças próprias que eu reuso.', eg:'templates de prompt, comandos, skills, rubricas'},
-    {v:5, main:'Esse contexto é do time: fica num lugar comum, mais de uma pessoa mantém, e evolui a cada entrega.'}
+    {v:4, main:'Tenho um contexto escrito, trabalhei nele neste mês, e criei peças próprias que eu reuso.', eg:'templates de prompt, comandos, skills, rubricas'},
+    {v:5, main:'O contexto é do time: fica num lugar comum, mais de uma pessoa mantém, e evolui a cada entrega.'}
    ]},
 
   {id:'jul', tag:'Julgamento crítico', title:'Quando ela erra bem escrito',
@@ -63,16 +63,16 @@ var QUESTIONS = [
     {v:2, main:'Já me queimei e agora desconfio, mas não tenho um jeito de saber onde ela erra.'},
     {v:3, main:'Sei onde ela costuma errar no meu domínio e olho ali primeiro.', eg:'número inventado, citação que não existe, regra de negócio ignorada, viés na amostra, código que roda e faz a coisa errada'},
     {v:4, main:'Escolho conscientemente o que não delego, e sei explicar o critério.', eg:'decisão de consequência alta, comunicação que precisa da minha voz, o julgamento que é a minha parte do trabalho'},
-    {v:5, main:'Ajudo o time a enxergar essa fronteira, com exemplos do nosso contexto de onde delegar compensa e onde não.'}
+    {v:5, main:'Ajudo o time a enxergar a fronteira entre o que compensa delegar e o que não, com exemplos do nosso contexto.'}
    ]},
 
   {id:'seg', tag:'Segurança e LGPD', title:'Dado e ferramenta',
    hint:'Como você trata dado e ferramenta ao usar IA no trabalho?',
    options:[
-    {v:1, main:'Não tenho critério definido: uso a ferramenta que está à mão com o dado que eu preciso.'},
+    {v:1, main:'Não tenho critério definido, ou não uso IA no trabalho.', eg:'uso a ferramenta que está à mão com o dado que eu preciso'},
     {v:2, main:'Evito o obviamente sensível, mas não verifico se a ferramenta é homologada.'},
     {v:3, main:'Uso ferramenta homologada e não coloco dado sensível em ferramenta que não é.', eg:'sensível = dado de cliente, credencial, contrato, base de leads, código proprietário'},
-    {v:4, main:'Além disso, penso em permissão e escopo antes de dar acesso a um agente.', eg:'o que ele pode ler, o que pode alterar, o que pode executar sozinho'},
+    {v:4, main:'Uso ferramenta homologada e ainda penso em permissão e escopo antes de dar acesso a um agente.', eg:'o que ele pode ler, o que pode alterar, o que pode executar sozinho'},
     {v:5, main:'Ajudo a definir critério de homologação, escopo de acesso de agentes e política de uso para o time.'}
    ]},
 
@@ -92,13 +92,13 @@ var QUESTIONS = [
 ];
 
 var LEVELS = [
-  {n:0, name:'Fora',          def:'Não usa IA no trabalho.', share:'0–10%'},
-  {n:1, name:'Consulta',      def:'Pergunta em janela separada e faz o trabalho sozinho. O material real não passa pela IA.', share:'15–30%'},
-  {n:2, name:'Aplicado',      def:'A IA trabalha no material de verdade; a pessoa aprova pedaço por pedaço.', share:'30–45%'},
-  {n:3, name:'Padronizado',   def:'Tarefa inteira delegada, com contexto preparado antes. Revisa só o resultado.', share:'10–25%'},
-  {n:4, name:'Sistematizado', def:'Existe um crivo que confere antes de chegar na pessoa, e/ou a IA produz sem ela presente.', share:'3–10%'},
-  {n:5, name:'Orquestrado',   def:'Vários agentes com papéis distintos em loop com critério de parada. A pessoa lê resultado e log.', share:'0–3%'},
-  {n:6, name:'Fronteira',     def:'Produz o que os outros usam: cria o mecanismo, mede com avaliação reproduzível, e tem material público adotado fora do time.', share:'≈ 0'}
+  {n:0, name:'Fora',          def:'Não usa IA no trabalho.'},
+  {n:1, name:'Consulta',      def:'Pergunta em janela separada e faz o trabalho sozinho. O material real não passa pela IA.'},
+  {n:2, name:'Aplicado',      def:'A IA trabalha no material de verdade; a pessoa aprova pedaço por pedaço.'},
+  {n:3, name:'Padronizado',   def:'Tarefa inteira delegada, com contexto preparado antes. Revisa só o resultado.'},
+  {n:4, name:'Sistematizado', def:'Existe um crivo que confere antes de chegar na pessoa, e/ou a IA produz sem ela presente.'},
+  {n:5, name:'Orquestrado',   def:'Vários agentes com papéis distintos em loop com critério de parada. A pessoa lê resultado e log.'},
+  {n:6, name:'Fronteira',     def:'Produz o que os outros usam: cria o mecanismo, mede com avaliação reproduzível, e tem material público adotado fora do time.'}
 ];
 
 /* Faixas conforme a fórmula em produção na planilha de respostas.
@@ -152,7 +152,8 @@ function score(a){
     toNextBand: next ? (next.min - sum) : null,
     nextBandLevel: next ? next.level : null,
     flags:{
-      data:      seg<=2,
+      /* quem não usa IA não pode ser acusado de expor dado por meio dela */
+      data:      seg<=2 && !(rot===0 && pic===0),
       uncritical:jul<=2 && level>=3,
       idle:      (pic-rot)>=2
     }
@@ -224,7 +225,9 @@ function buildForm(){
       box.appendChild(lab);
     });
     sec.appendChild(box);
-    sec.appendChild(el('p','q-warn','Escolha uma opção para continuar.'));
+    var warn = el('p','q-warn','Escolha uma opção para continuar.');
+    warn.id = 'warn-' + q.id;
+    sec.appendChild(warn);
     form.appendChild(sec);
   });
 
@@ -243,6 +246,7 @@ function onChange(e){
     if (checked.length > q.multi){
       input.checked = false;
       checked = checked.filter(function(c){ return c !== input; });
+      avisaTeto(q);
     }
     answers[q.id] = checked.map(function(c){ return c.value; });
     if (!answers[q.id].length) delete answers[q.id];
@@ -253,14 +257,29 @@ function onChange(e){
   document.querySelectorAll('input[name="'+q.id+'"]').forEach(function(c){
     c.closest('.opt').setAttribute('data-on', c.checked ? '1' : '0');
   });
-  document.getElementById('q-'+q.id).classList.remove('missing');
+  var sec = document.getElementById('q-'+q.id);
+  sec.classList.remove('missing');
+  sec.removeAttribute('aria-describedby');
   updateProgress();
+}
+
+/* o clique é desfeito; sem retorno visual o card parece quebrado */
+function avisaTeto(q){
+  var sec = document.getElementById('q-'+q.id);
+  var w = sec.querySelector('.q-warn');
+  w.textContent = 'Máximo de ' + q.multi + '. Desmarque uma para trocar.';
+  sec.classList.add('missing','limit');
+  clearTimeout(w._t);
+  w._t = setTimeout(function(){
+    sec.classList.remove('missing','limit');
+    w.textContent = 'Escolha uma opção para continuar.';
+  }, 2600);
 }
 
 function updateProgress(){
   var done = QUESTIONS.filter(function(q){ return answers[q.id] !== undefined; }).length;
   var bar = document.getElementById('bar');
-  if (done > 0) bar.hidden = false;
+  bar.hidden = done === 0;
   document.getElementById('count').textContent = done + ' de ' + TOTAL;
   document.getElementById('fill').style.width = (done/TOTAL*100) + '%';
 }
@@ -268,13 +287,13 @@ function updateProgress(){
 /* ---------------- resultado ---------------- */
 
 var DIMS = [
-  {k:'rot', label:'Rotina',      sub:'o dia comum',        max:6, collective:true},
-  {k:'pic', label:'Pico',        sub:'o melhor dia',       max:6, collective:false},
-  {k:'pro', label:'Durabilidade',sub:'o que sobra sem você', max:5, collective:true},
-  {k:'ver', label:'Verificação', sub:'como você confere',  max:5, collective:false},
-  {k:'ctx', label:'Contexto',    sub:'o que a IA sabe',    max:5, collective:true},
-  {k:'jul', label:'Julgamento',  sub:'onde ela erra',      max:5, collective:false},
-  {k:'seg', label:'Segurança',   sub:'fora da soma',       max:5, collective:false}
+  {k:'rot', label:'Rotina',      sub:'o dia comum',        max:6},
+  {k:'pic', label:'Pico',        sub:'o melhor dia',       max:6},
+  {k:'pro', label:'Durabilidade',sub:'o que sobra sem você', max:5},
+  {k:'ver', label:'Verificação', sub:'como você confere',  max:5},
+  {k:'ctx', label:'Contexto',    sub:'o que a IA sabe',    max:5},
+  {k:'jul', label:'Julgamento',  sub:'onde ela erra',      max:5},
+  {k:'seg', label:'Segurança',   sub:'fora da soma',       max:5}
 ];
 
 var CAP_TEXT = {
@@ -318,6 +337,7 @@ function render(a){
   var h = '';
 
   h += '<div class="res-hero">';
+  h += '<h2 class="sr-only">O seu resultado</h2>';
   h += '<p class="overline">O seu nível hoje</p>';
   h += '<p class="res-level">N' + r.level + '</p>';
   h += '<p class="res-name">' + esc(L.name) + '</p>';
@@ -337,7 +357,7 @@ function render(a){
   DIMS.forEach(function(d){
     var v = a[d.k];
     var pct = (v / d.max) * 100;
-    var low = v <= (d.max === 6 ? 3 : 3);
+    var low = v <= 3;
     h += '<div class="dim' + (low ? ' low' : '') + '">';
     h += '<span class="lbl">' + esc(d.label) + '<small>' + esc(d.sub) + '</small></span>';
     h += '<span class="track"><span class="fill" style="width:' + pct.toFixed(1) + '%"></span></span>';
@@ -348,8 +368,12 @@ function render(a){
   h += '<div><div class="k">Soma</div><div class="v">' + r.sum + '</div></div>';
   h += '<div><div class="k">Faixa da soma</div><div class="v">N' + r.raw + '</div></div>';
   h += '<div><div class="k">Nível final</div><div class="v">N' + r.level + '</div></div>';
-  if (r.toNextBand !== null){
+  /* ganhar pontos só muda o nível se nenhum teto já estiver no caminho */
+  var tetoAtivo = Math.min(r.caps.anchor, r.caps.ver, r.caps.pro, r.caps.top);
+  if (r.toNextBand !== null && r.level > 0 && tetoAtivo > r.level){
     h += '<div><div class="k">Para a próxima faixa</div><div class="v">' + r.toNextBand + ' pt' + (r.toNextBand>1?'s':'') + '</div></div>';
+  } else if (r.level > 0 && tetoAtivo <= r.level){
+    h += '<div><div class="k">Teto pela trava</div><div class="v">N' + tetoAtivo + '</div></div>';
   }
   h += '</div></div>';
 
@@ -381,7 +405,7 @@ function render(a){
     if (r.flags.data){
       h += card('alert', 'Risco de dado',
         '<p>A sua resposta sobre dado e ferramenta ficou em 1 ou 2. Este é o único resultado da régua que pede ação antes de qualquer trilha de capacitação, e ele fica fora da soma de propósito: nenhuma resposta boa em outra pergunta compensa dado sensível numa ferramenta não homologada.</p>' +
-        '<p>Sensível quer dizer dado de aluno ou cliente, credencial, contrato, base de leads, código proprietário. Vale descobrir hoje o que a sua organização homologou — e, se a resposta for “nada”, essa é a conversa a puxar.</p>');
+        '<p>Sensível quer dizer dado de cliente, credencial, contrato, base de leads, código proprietário. Vale descobrir hoje o que a sua organização homologou — e, se a resposta for “nada”, essa é a conversa a puxar.</p>');
     }
     if (r.flags.uncritical){
       h += card('alert', 'Uso acrítico',
@@ -429,9 +453,17 @@ function render(a){
   document.getElementById('form-view').style.display = 'none';
   document.getElementById('bar').hidden = true;
   window.scrollTo(0,0);
+  /* o botão que tinha o foco acabou de ser escondido: leva o foco ao resultado,
+     senão quem navega por teclado ou leitor de tela não percebe que algo mudou */
+  out.focus();
+  document.title = 'N' + r.level + ' · ' + L.name + ' — Régua de maturidade em IA';
   document.getElementById('again').addEventListener('click', function(){
     location.reload();
   });
+}
+
+function suave(){
+  return !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 }
 
 function card(cls, title, body){
@@ -442,11 +474,16 @@ function submit(){
   var missing = QUESTIONS.filter(function(q){ return answers[q.id] === undefined; });
   document.querySelectorAll('.q').forEach(function(n){ n.classList.remove('missing'); });
   if (missing.length){
-    missing.forEach(function(q){ document.getElementById('q-'+q.id).classList.add('missing'); });
-    var first = document.getElementById('q-'+missing[0].id);
-    first.scrollIntoView({behavior:'smooth', block:'center'});
+    missing.forEach(function(q){
+      var sec = document.getElementById('q-'+q.id);
+      sec.classList.add('missing');
+      sec.setAttribute('aria-describedby', 'warn-'+q.id);
+    });
     document.getElementById('submit-sub').textContent =
       'Falta' + (missing.length>1 ? 'm ' + missing.length + ' perguntas' : ' 1 pergunta') + '.';
+    var first = document.getElementById('q-'+missing[0].id);
+    first.scrollIntoView({block:'center', behavior: suave() ? 'smooth' : 'auto'});
+    first.querySelector('input').focus();
     return;
   }
   render(answers);
@@ -458,4 +495,4 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 /* exposto para os testes automatizados */
-window.__regua = {score:score, band:band, QUESTIONS:QUESTIONS, LEVELS:LEVELS};
+window.__regua = {score:score, band:band, QUESTIONS:QUESTIONS, LEVELS:LEVELS, BLOQ_TEXT:BLOQ_TEXT};

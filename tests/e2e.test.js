@@ -10,6 +10,38 @@ const t = async (nome, fn) => {
 const eq = (a, b, m) => { if (a !== b) throw new Error(`${m || ''} esperado ${JSON.stringify(b)}, obtido ${JSON.stringify(a)}`); };
 const ok = (c, m) => { if (!c) throw new Error(m || 'condição falsa'); };
 
+/* mede o contraste real de cada texto visível contra o fundo efetivo */
+async function contrasteRuim(page){
+  return page.evaluate(() => {
+    const lum = rgb => {
+      const c = rgb.map(v => { v /= 255; return v <= .03928 ? v/12.92 : Math.pow((v+.055)/1.055, 2.4); });
+      return .2126*c[0] + .7152*c[1] + .0722*c[2];
+    };
+    const parse = s => (s.match(/[\d.]+/g) || []).slice(0,3).map(Number);
+    const opaco = s => s && s !== 'transparent' && !/rgba\(0, 0, 0, 0\)/.test(s);
+    const fundoDe = n => {
+      for (let e = n; e; e = e.parentElement){
+        const bg = getComputedStyle(e).backgroundColor;
+        if (opaco(bg)) return parse(bg);
+      }
+      return [255,255,255];
+    };
+    const ratio = (a,b) => { const [x,y] = [lum(a), lum(b)].sort((p,q)=>q-p); return (x+.05)/(y+.05); };
+    const out = [];
+    document.querySelectorAll('body *').forEach(n => {
+      const txt = Array.from(n.childNodes).filter(c => c.nodeType === 3).map(c => c.textContent.trim()).join('');
+      if (!txt) return;
+      const cs = getComputedStyle(n);
+      if (cs.visibility === 'hidden' || cs.display === 'none' || !n.offsetParent) return;
+      const px = parseFloat(cs.fontSize), peso = parseInt(cs.fontWeight, 10) || 400;
+      const min = (px >= 24 || (px >= 18.66 && peso >= 700)) ? 3 : 4.5;
+      const r = ratio(parse(cs.color), fundoDe(n));
+      if (r < min) out.push(`${n.className || n.tagName} "${txt.slice(0,26)}" ${cs.color} ${r.toFixed(2)}:1 (min ${min})`);
+    });
+    return out;
+  });
+}
+
 /* marca uma resposta pelo VALOR — a ordem das alternativas é aleatória */
 async function pick(page, qid, valor){
   await page.locator(`#q-${qid} .opt[data-v="${valor}"]`).click();
@@ -179,6 +211,129 @@ async function fill(page, a){
       const azul = 'rgb(0, 102, 204)';
       eq(cores.find(c => c.label==='Verificação').bg, azul, 'verificação (2/5) deveria estar em azul:');
       ok(cores.find(c => c.label==='Rotina').bg !== azul, 'rotina (5/6) não deveria estar em azul');
+    });
+    await page.close();
+  }
+
+  console.log('\n— o que o resultado não pode dizer —');
+  {
+    /* caso travado pela verificação: subir a soma não sobe o nível */
+    const page = await browser.newPage();
+    await page.goto(URL);
+    await fill(page, {rot:5,pic:5,pro:4,ver:2,ctx:4,jul:2,seg:3});
+    await page.click('#submit');
+    await page.waitForSelector('#result.on');
+    const txt = await page.locator('#result').textContent();
+    await t('caso travado não promete pontos para a próxima faixa', async () => {
+      ok(!txt.includes('Para a próxima faixa'),
+        'o tile aparece mesmo com o nível travado — contradiz o card da trava');
+    });
+    await t('caso travado mostra o teto imposto pela trava', async () => {
+      ok(txt.includes('Teto pela trava'));
+    });
+    await page.close();
+  }
+  {
+    /* caso sem trava: aí o número serve */
+    const page = await browser.newPage();
+    await page.goto(URL);
+    await fill(page, {rot:3,pic:3,pro:4,ver:3,ctx:3,jul:4,seg:5});
+    await page.click('#submit');
+    await page.waitForSelector('#result.on');
+    await t('caso sem trava mostra os pontos para a próxima faixa', async () => {
+      ok((await page.locator('#result').textContent()).includes('Para a próxima faixa'));
+    });
+    await page.close();
+  }
+  {
+    /* quem não usa IA não pode sair acusado de expor dado */
+    const page = await browser.newPage();
+    await page.goto(URL);
+    await fill(page, {rot:0,pic:0,pro:1,ver:1,ctx:1,jul:1,seg:1});
+    await page.click('#submit');
+    await page.waitForSelector('#result.on');
+    const txt = await page.locator('#result').textContent();
+    await t('perfil N0 não recebe alerta de risco de dado', async () => {
+      ok(!txt.includes('Risco de dado'), 'quem declarou não usar IA foi acusado de expor dado');
+    });
+    await t('perfil N0 recebe a leitura própria do nível', async () => {
+      ok(txt.includes('resposta legítima'));
+    });
+    await page.close();
+  }
+
+  console.log('\n— foco e anúncio —');
+  {
+    const page = await browser.newPage();
+    await page.goto(URL);
+    await t('submeter incompleto leva o foco à primeira pergunta faltante', async () => {
+      await pick(page, 'pic', 3);
+      await page.click('#submit');
+      const id = await page.evaluate(() => document.activeElement.closest('.q')?.id);
+      eq(id, 'q-rot');
+    });
+    await t('o aviso de faltantes é anunciável', async () => {
+      eq(await page.getAttribute('#submit-sub', 'aria-live'), 'polite');
+      ok((await page.locator('#q-rot').getAttribute('aria-describedby')) === 'warn-rot');
+    });
+    await t('responder limpa o vínculo com o aviso', async () => {
+      await pick(page, 'rot', 3);
+      eq(await page.locator('#q-rot').getAttribute('aria-describedby'), null);
+    });
+    await t('a terceira marcação avisa em vez de falhar em silêncio', async () => {
+      for (const v of ['a','b','c']) await pick(page, 'bloq', v);
+      ok(await page.locator('#q-bloq.limit').isVisible(), 'sem retorno visual no teto');
+      ok((await page.locator('#q-bloq .q-warn').textContent()).includes('Máximo de 2'));
+    });
+    await page.close();
+  }
+  {
+    const page = await browser.newPage();
+    await page.goto(URL);
+    await fill(page, {rot:4,pic:4,pro:4,ver:4,ctx:4,jul:4,seg:4});
+    await page.click('#submit');
+    await page.waitForSelector('#result.on');
+    await t('o foco vai para o resultado', async () => {
+      eq(await page.evaluate(() => document.activeElement.id), 'result');
+    });
+    await t('o título da aba passa a informar o nível', async () => {
+      ok((await page.title()).startsWith('N4 ·'), await page.title());
+    });
+    await t('o resultado abre com um h2, sem pular nível de heading', async () => {
+      eq(await page.evaluate(() => document.querySelector('#result h2, #result h3').tagName), 'H2');
+    });
+    await page.close();
+  }
+
+  console.log('\n— aparência —');
+  {
+    const page = await browser.newPage();
+    await page.goto(URL);
+    await t('todo texto do formulário passa em WCAG AA', async () => {
+      const ruins = await contrasteRuim(page);
+      ok(ruins.length === 0, ruins.slice(0,6).join('\n         '));
+    });
+    await t('as barras mantêm a cor na impressão', async () => {
+      await fill(page, {rot:4,pic:4,pro:4,ver:4,ctx:4,jul:4,seg:4});
+      await page.click('#submit');
+      await page.waitForSelector('#result.on');
+      await page.emulateMedia({media:'print'});
+      const v = await page.evaluate(() => getComputedStyle(document.querySelector('.dim .fill')).printColorAdjust);
+      eq(v, 'exact');
+      await page.emulateMedia({media:'screen'});
+    });
+    await t('todo texto do resultado passa em WCAG AA', async () => {
+      const ruins = await contrasteRuim(page);
+      ok(ruins.length === 0, ruins.slice(0,6).join('\n         '));
+    });
+    await page.close();
+  }
+  {
+    const page = await (await browser.newContext({javaScriptEnabled:false})).newPage();
+    await page.goto(URL);
+    await t('sem JavaScript, explica o motivo e esconde o botão inerte', async () => {
+      ok(await page.locator('noscript').count() > 0);
+      ok(!(await page.locator('#submit').isVisible()), 'botão inerte visível sem JS');
     });
     await page.close();
   }

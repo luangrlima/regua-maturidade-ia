@@ -2,16 +2,24 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
+<meta name="color-scheme" content="light">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Régua de maturidade em IA</title>
 <meta name="description" content="Diagnóstico de maturidade em IA. Oito perguntas, escala N0–N6. O resultado sai na hora, no seu navegador. Nada é enviado nem salvo.">
 <meta property="og:title" content="Régua de maturidade em IA">
 <meta property="og:description" content="Oito perguntas. O seu nível de N0 a N6, a trava que segurou e o que destravar. Nada é enviado nem salvo.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://regua-maturidade-ia.pages.dev/">
+<meta property="og:image" content="https://regua-maturidade-ia.pages.dev/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Régua de maturidade em IA — oito perguntas, escala N0 a N6.">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f5f5f7'/><rect x='14' y='42' width='72' height='7' fill='%231d1d1f'/><rect x='14' y='60' width='44' height='7' fill='%230066cc'/></svg>">
 <style>
 :root{
-  --ink:#1d1d1f; --ink-80:#333333; --ink-48:#7a7a7a; --muted:#6e6e73;
+  --ink:#1d1d1f; --ink-80:#333333; --ink-48:#666666; --muted:#6e6e73;
   --canvas:#ffffff; --parchment:#f5f5f7; --pearl:#fafafc;
   --hairline:#e0e0e0; --divider:#f0f0f0; --chip:#d2d2d7;
   --primary:#0066cc; --primary-focus:#0071e3; --on-primary:#ffffff;
@@ -95,7 +103,7 @@ h1{
 .opt input{position:absolute; opacity:0; width:0; height:0}
 .dot{
   flex:none; width:20px; height:20px; margin-top:2px; border-radius:9999px;
-  border:1.5px solid var(--chip); background:var(--canvas); transition:border-color .15s;
+  border:1.5px solid #8a8a8f; background:var(--canvas); transition:border-color .15s;
   display:grid; place-items:center
 }
 .dot::after{content:""; width:9px; height:9px; border-radius:9999px; background:var(--on-primary); transform:scale(0); transition:transform .15s}
@@ -108,6 +116,8 @@ h1{
 .opt .main{font-size:16px; line-height:1.42; letter-spacing:-0.3px}
 .opt .eg{display:block; margin-top:5px; font-size:14px; line-height:1.45; color:var(--muted); letter-spacing:-0.2px}
 .q.missing{box-shadow:0 0 0 2px var(--oxide)}
+.q.limit{box-shadow:0 0 0 2px var(--ochre)}
+.q.limit .q-warn{color:var(--ochre)}
 .q-warn{display:none; margin-top:14px; font-size:14px; color:var(--oxide); font-weight:600}
 .q.missing .q-warn{display:block}
 
@@ -136,7 +146,9 @@ details.gloss dd{margin:2px 0 0; color:var(--muted)}
 .actions .sub{margin-top:14px; font-size:14px; color:var(--muted)}
 
 /* ---------- resultado ---------- */
+.sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
 #result{display:none}
+#result:focus{outline:none}
 #result.on{display:block}
 .res-hero{padding:64px 0 var(--xl); border-bottom:1px solid var(--hairline); margin-bottom:var(--xl)}
 .res-level{
@@ -219,9 +231,9 @@ footer .credit-code{margin-top:-2px}
 </head>
 <body>
 
-<div class="progress print-hide" id="bar" hidden>
+<div class="progress" id="bar" hidden>
   <div class="progress-in">
-    <span class="progress-count" id="count">0 de 9</span>
+    <span class="progress-count" id="count">0 de 8</span>
     <span class="progress-track"><span class="progress-fill" id="fill"></span></span>
   </div>
 </div>
@@ -257,6 +269,7 @@ footer .credit-code{margin-top:-2px}
   </details>
 
   <noscript>
+    <style>#form, #form-view .actions{display:none}</style>
     <div class="q">
       <h2>Este diagnóstico precisa de JavaScript</h2>
       <p class="hint">As perguntas e o cálculo do resultado rodam inteiramente no seu navegador — é justamente por isso que nada é enviado para lugar nenhum. Com o JavaScript desativado, não há como montar o formulário nem calcular o nível. Ative-o para esta página e recarregue.</p>
@@ -267,11 +280,11 @@ footer .credit-code{margin-top:-2px}
 
   <div class="actions">
     <button class="btn" id="submit" type="button">Ver o meu resultado</button>
-    <p class="sub" id="submit-sub">O cálculo roda aqui no seu navegador.</p>
+    <p class="sub" id="submit-sub" role="status" aria-live="polite">O cálculo roda aqui no seu navegador.</p>
   </div>
 </div>
 
-<section id="result" aria-live="polite"></section>
+<section id="result" tabindex="-1"></section>
 
 <footer>
   <p><strong>Régua de maturidade em IA · v3</strong> — oito perguntas de escolha, escala única N0–N6 sem bifurcação por papel, topo referenciado a critério externo. As alternativas aparecem em ordem aleatória a cada carregamento, para que a ordem não sugira a resposta.</p>

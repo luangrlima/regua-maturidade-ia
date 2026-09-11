@@ -66,17 +66,28 @@ npm install          # só playwright, para o E2E
 npm test
 ```
 
-**`tests/score.test.js`** — 30.707 verificações. Compara a implementação com uma réplica
+**`tests/score.test.js`** — 30.713 verificações. Compara a implementação com uma réplica
 literal da fórmula em produção na planilha de respostas, varrendo exaustivamente as 30.625
 combinações possíveis de resposta, mais invariantes (nenhum limite pode ser violado em
 nenhuma combinação) e casos nomeados.
 
-**`tests/e2e.test.js`** — 39 verificações no navegador: renderização das oito perguntas,
+Verifica também a redação, que a aritmética não alcança: como as alternativas são
+embaralhadas, nenhuma pode se referir à anterior ("Além disso…", "Esse crivo…") — fora de
+ordem, essas frases perdem o antecedente. E toda pergunta pontuada precisa manter a
+alternativa de "não uso IA".
+
+**`tests/e2e.test.js`** — 55 verificações no navegador: renderização das oito perguntas,
 validação de campos faltantes, teto de duas marcações na múltipla escolha, sete perfis
 calculados na tela, conteúdo do resultado, geometria e cor das barras, ausência total de
 requisição de rede / storage / cookie, ausência de rolagem horizontal em três larguras,
 navegação por teclado, e as garantias de neutralidade — nenhum código de nível visível,
 nenhum peso exibido, nenhuma pergunta de cargo, nenhum campo de texto ou e-mail.
+
+Cobre também o que o resultado **não** pode dizer: um nível travado por limite não promete
+pontos para a próxima faixa (subir a soma não moveria o nível), e quem declara não usar IA
+não recebe alerta de risco de dado. Mede o contraste real de cada texto renderizado nas duas
+telas contra o fundo efetivo, exige que o foco vá para o resultado ao submeter, e roda o
+estado sem JavaScript.
 
 **`tests/shuffle.test.js`** — 24 verificações em 12 carregamentos: a ordem das alternativas
 varia, nunca sai crescente em todos eles, e nenhuma alternativa se perde ou duplica no

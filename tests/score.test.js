@@ -8,7 +8,7 @@ const sandbox = {
 };
 vm.createContext(sandbox);
 vm.runInContext(fs.readFileSync(path.join(__dirname,'..','app.js'),'utf8'), sandbox);
-const { score } = sandbox.window.__regua;
+const { score, QUESTIONS, BLOQ_TEXT } = sandbox.window.__regua;
 
 /* réplica literal das fórmulas da planilha, para comparar contra */
 const sheetSum = a => a.rot*2 + a.ver*2 + a.pic + a.pro + a.ctx + a.jul;
@@ -110,6 +110,39 @@ const p = score({rot:3,pic:3,pro:4,ver:3,ctx:3,jul:4,seg:5});
 check('soma 26 → faltam 2 pts para a faixa N4 (28)', p.toNextBand === 2 && p.nextBandLevel === 4);
 check('no topo, toNextBand é nulo',
   score({rot:6,pic:6,pro:5,ver:5,ctx:5,jul:5,seg:5}).toNextBand === null);
+
+/* --- garantias de redação, que a aritmética não cobre --- */
+
+/* as alternativas aparecem embaralhadas: nenhuma pode depender da anterior */
+const ANAFORA = /^(Além disso|Esse |Essa |Ficariam também|Tenho,)|essa fronteira|esse crivo|esse contexto/i;
+const quebradas = [];
+for (const q of QUESTIONS)
+  for (const o of q.options)
+    if (ANAFORA.test(o.main)) quebradas.push(`${q.id}: "${o.main.slice(0,50)}…"`);
+check('nenhuma alternativa se refere à alternativa anterior', quebradas.length === 0);
+if (quebradas.length) fails.push('anáforas: ' + quebradas.join(' | '));
+
+/* quem não usa IA precisa de saída em toda pergunta pontuada */
+const semSaida = QUESTIONS
+  .filter(q => q.id !== 'bloq')
+  .filter(q => !q.options.some(o => /não us(o|ei) IA/i.test(o.main)))
+  .map(q => q.id);
+check('toda pergunta pontuada tem alternativa de "não uso IA"', semSaida.length === 0);
+if (semSaida.length) fails.push('sem saída de não-uso: ' + semSaida.join(', '));
+
+/* quem declarou não usar IA não pode ser acusado de expor dado por meio dela */
+check('perfil N0 não acende a flag de risco de dado',
+  score({rot:0,pic:0,pro:1,ver:1,ctx:1,jul:1,seg:1}).flags.data === false);
+check('quem usa IA e responde seg=1 continua acendendo a flag',
+  score({rot:3,pic:3,pro:4,ver:3,ctx:3,jul:3,seg:1}).flags.data === true);
+
+/* todo bloqueio precisa de texto, senão o resultado imprime undefined */
+const bloq = QUESTIONS.find(q => q.id === 'bloq');
+const semTexto = bloq.options.filter(o => !BLOQ_TEXT[o.v]).map(o => o.v);
+check('BLOQ_TEXT cobre todas as alternativas de bloqueio', semTexto.length === 0);
+if (semTexto.length) fails.push('bloqueios sem texto: ' + semTexto.join(', '));
+const sobrando = Object.keys(BLOQ_TEXT).filter(k => !bloq.options.some(o => o.v === k));
+check('BLOQ_TEXT não tem texto órfão', sobrando.length === 0);
 
 let iOk=0, iBad=0;
 for (const [nome, cond] of inv){
