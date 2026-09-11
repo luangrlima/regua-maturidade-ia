@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Régua de maturidade em IA</title>
-<meta name="description" content="Diagnóstico de maturidade em IA. Nove perguntas, escala N0–N6. O resultado sai na hora, no seu navegador. Nada é enviado nem salvo.">
+<meta name="description" content="Diagnóstico de maturidade em IA. Oito perguntas, escala N0–N6. O resultado sai na hora, no seu navegador. Nada é enviado nem salvo.">
 <meta property="og:title" content="Régua de maturidade em IA">
-<meta property="og:description" content="Nove perguntas. O seu nível de N0 a N6, a trava que segurou e o que destravar. Nada é enviado nem salvo.">
+<meta property="og:description" content="Oito perguntas. O seu nível de N0 a N6, a trava que segurou e o que destravar. Nada é enviado nem salvo.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23f5f5f7'/><rect x='14' y='42' width='72' height='7' fill='%231d1d1f'/><rect x='14' y='60' width='44' height='7' fill='%230066cc'/></svg>">
 <style>
@@ -80,7 +80,6 @@ h1{
   background:var(--parchment); color:var(--ink-80); border-radius:9999px;
   padding:3px 10px; letter-spacing:.6px
 }
-.q-tag .w{color:var(--primary); letter-spacing:1.2px}
 .q h2{
   font-family:var(--display); font-size:clamp(22px,3.2vw,28px); font-weight:600;
   line-height:1.2; letter-spacing:-0.7px; margin:0 0 10px
@@ -106,11 +105,6 @@ h1{
 .opt[data-on="1"] .dot::after{transform:scale(1)}
 .opt:focus-within{outline:2px solid var(--primary-focus); outline-offset:2px}
 .opt .txt{min-width:0}
-.opt .code{
-  font-size:12px; font-weight:600; letter-spacing:.8px; color:var(--muted);
-  display:block; margin-bottom:3px
-}
-.opt[data-on="1"] .code{color:var(--primary)}
 .opt .main{font-size:16px; line-height:1.42; letter-spacing:-0.3px}
 .opt .eg{display:block; margin-top:5px; font-size:14px; line-height:1.45; color:var(--muted); letter-spacing:-0.2px}
 .q.missing{box-shadow:0 0 0 2px var(--oxide)}
@@ -210,11 +204,15 @@ footer{
   padding:var(--xl) 0 var(--section); font-size:14px; color:var(--muted); line-height:1.6
 }
 footer p{margin:0 0 10px}
-.print-only{display:none}
+footer .credit{margin-top:var(--lg); padding-top:var(--lg); border-top:1px solid var(--divider); color:var(--ink-80)}
 @media print{
-  .progress,.actions,.print-hide{display:none !important}
+  .progress,.actions{display:none !important}
   body{background:#fff}
   .card,.dims,.q{break-inside:avoid}
+  .dim .fill,.scale-cell{-webkit-print-color-adjust:exact; print-color-adjust:exact}
+}
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important; animation:none !important}
 }
 </style>
 </head>
@@ -233,7 +231,7 @@ footer p{margin:0 0 10px}
   <header>
     <p class="overline">Diagnóstico · escala N0–N6</p>
     <h1>Régua de maturidade em IA</h1>
-    <p class="lead">Nove perguntas sobre o que você realmente faz — não sobre o que você acha que domina. O resultado sai na hora.</p>
+    <p class="lead">Oito perguntas sobre o que você realmente faz — não sobre o que você acha que domina. O resultado sai na hora.</p>
     <p class="notice">
       <strong>Não é avaliação de desempenho.</strong> Não existe nível bom nem ruim: existe o seu nível hoje. O valor do exercício depende de você marcar o que realmente acontece, não o que soa melhor. Um nível baixo honesto é mais útil que um nível alto otimista.<br><br>
       <strong>Nada sai do seu navegador.</strong> Não há envio, não há servidor, não há cookie. Fechou a aba, acabou.<br><br>
@@ -257,6 +255,13 @@ footer p{margin:0 0 10px}
     </dl>
   </details>
 
+  <noscript>
+    <div class="q">
+      <h2>Este diagnóstico precisa de JavaScript</h2>
+      <p class="hint">As perguntas e o cálculo do resultado rodam inteiramente no seu navegador — é justamente por isso que nada é enviado para lugar nenhum. Com o JavaScript desativado, não há como montar o formulário nem calcular o nível. Ative-o para esta página e recarregue.</p>
+    </div>
+  </noscript>
+
   <form id="form" novalidate></form>
 
   <div class="actions">
@@ -268,9 +273,10 @@ footer p{margin:0 0 10px}
 <section id="result" aria-live="polite"></section>
 
 <footer>
-  <p><strong>Régua de maturidade em IA · v3</strong> — nove perguntas de escolha, escala única N0–N6 sem bifurcação por papel, topo referenciado a critério externo, soma com pesos e quatro limites.</p>
+  <p><strong>Régua de maturidade em IA · v3</strong> — oito perguntas de escolha, escala única N0–N6 sem bifurcação por papel, topo referenciado a critério externo. As alternativas aparecem em ordem aleatória a cada carregamento, para que a ordem não sugira a resposta.</p>
   <p>Construída sobre Parasuraman, Sheridan &amp; Wickens (2000); Sheridan &amp; Verplank (1978); SAE J3016; Eledath (2026), <em>8 Levels of Agentic Engineering</em>; Google Cloud/DORA (2025); MAILS (Carolus et al., 2023); e a literatura de BARS e vinhetas de ancoragem.</p>
   <p>Mede comportamento declarado, não capacidade demonstrada. Serve para desenhar trilha e achar gargalo. Não serve para comparar pessoas nem justificar decisão sobre alguém.</p>
+  <p class="credit">Feito por <a href="https://www.linkedin.com/in/luanlima" target="_blank" rel="noopener noreferrer">Luan Lima</a> — gerente de tecnologia na Wiser Educação. Se você rodar isso no seu time, me chame para trocar sobre o resultado.</p>
 </footer>
 
 </main>

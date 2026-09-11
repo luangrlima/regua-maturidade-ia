@@ -3,97 +3,88 @@
 
 /* As sete alternativas de rotina/pico. Iguais nas duas perguntas, por desenho. */
 var ANCHOR = [
-  {v:0, code:'N0', main:'Não usei IA no meu trabalho nesse período.'},
-  {v:1, code:'N1', main:'Perguntei numa janela separada e fiz o trabalho eu mesmo.',
+  {v:0, main:'Não usei IA no meu trabalho nesse período.'},
+  {v:1, main:'Perguntei numa janela separada e fiz o trabalho eu mesmo.',
    eg:'tirar uma dúvida, revisar um texto, entender um termo que apareceu na reunião'},
-  {v:2, code:'N2', main:'Entreguei o meu material de verdade e a IA trabalhou em cima dele; eu aprovei pedaço por pedaço.',
+  {v:2, main:'Entreguei o meu material de verdade e a IA trabalhou em cima dele; eu aprovei pedaço por pedaço.',
    eg:'autocomplete na IDE editando os meus arquivos; subir a planilha e pedir o cruzamento; jogar as transcrições da pesquisa e pedir a categorização'},
-  {v:3, code:'N3', main:'Deleguei uma tarefa inteira, com contexto que eu preparei antes, e revisei só o resultado final.',
+  {v:3, main:'Deleguei uma tarefa inteira, com contexto que eu preparei antes, e revisei só o resultado final.',
    eg:'agente que planeja, implementa e testa a task; “monte o discovery a partir destas entrevistas e do nosso template”'},
-  {v:4, code:'N4', main:'Montei um crivo que confere o trabalho antes de chegar em mim, e/ou deixei a IA produzindo sem eu estar presente.',
+  {v:4, main:'Montei um crivo que confere o trabalho antes de chegar em mim, e/ou deixei a IA produzindo sem eu estar presente.',
    eg:'testes que o agente roda até passar; rubrica que a IA aplica no próprio resultado; automação que abre o ticket sozinha quando chega o e-mail'},
-  {v:5, code:'N5', main:'Vários agentes com papéis diferentes rodando até fechar o critério; eu li o resultado e o registro.',
+  {v:5, main:'Vários agentes com papéis diferentes rodando até fechar o critério; eu li o resultado e o registro.',
    eg:'um implementa, outro revisa, repete até passar; um pesquisa, outro redige, outro critica contra a rubrica'},
-  {v:6, code:'N6', main:'Construo o que os outros usam: crio o mecanismo, meço com avaliação reproduzível, e ele virou material público adotado por gente de fora do meu time.'}
+  {v:6, main:'Construo o que os outros usam: crio o mecanismo, meço com avaliação reproduzível, e ele virou material público adotado por gente de fora do meu time.'}
 ];
 
 var QUESTIONS = [
-  {id:'rot', tag:'Âncora · rotina', weight:'Peso ×2', title:'O seu dia comum',
+  {id:'rot', tag:'Rotina', title:'O seu dia comum',
    hint:'Nas últimas 4 semanas, o que descreve a maioria dos seus dias de trabalho? Não o melhor dia — o dia comum.',
    options:ANCHOR},
 
-  {id:'pic', tag:'Âncora · pico', weight:'Peso ×1', title:'O mais fundo que você chegou',
+  {id:'pic', tag:'Pico', title:'O mais fundo que você chegou',
    hint:'Ainda nas últimas 4 semanas: qual foi a forma mais avançada como você usou IA? Marque o mais alto que você realmente fez — não o que sabe que existe, nem o que viu alguém fazer.',
-   note:'Você não está em N6 se usa Claude Code, Cursor ou Codex com subagentes, mesmo muito bem e todos os dias — isso é N5. Nem se montou testes, eval ou automação para o seu próprio projeto — isso é N4 ou N5. Nem se acompanha os lançamentos e testa modelo novo no dia — isso é insumo, não nível. Nem se é a pessoa que mais entende de IA no time — isso é posição relativa ao grupo, e esta escala não é relativa ao grupo. N6 é o degrau de quem faz da fronteira da área o objeto do trabalho e tem material público adotado fora do próprio time. Ele existe para dar escala aos degraus abaixo; o esperado é ninguém marcar.',
    options:ANCHOR},
 
-  {id:'pro', tag:'Prova', weight:'Peso ×1', title:'O que sobreviveria a você',
+  {id:'pro', tag:'Durabilidade', title:'O que sobreviveria a você',
    hint:'Se você saísse de férias amanhã, o que sobraria do seu jeito de trabalhar com IA?',
    options:[
     {v:1, main:'Nada, ou não uso IA no trabalho.'},
     {v:2, main:'Ficaria o que eu já entreguei, mas ninguém saberia como eu cheguei lá.', eg:'o código, o documento, a análise — e mais nada'},
     {v:3, main:'Ficariam também os meus prompts e instruções salvos; alguém acharia, mas precisaria de mim para entender.', eg:'uma pasta de prompts, um projeto customizado meu, um doc de anotações'},
-    {v:4, main:'Ficaria o mecanismo montado e funcionando — outra pessoa conseguiria usar sem eu explicar.', eg:'as regras no repositório, os testes rodando, a rubrica de aceite, a automação ligada'},
+    {v:4, main:'Ficaria o mecanismo montado, funcionando e outra pessoa conseguiria usar sem eu explicar.', eg:'as regras no repositório, os testes rodando, a rubrica de aceite, a automação ligada'},
     {v:5, main:'Além disso, tem coisa minha rodando fora do meu time, usada por gente que eu não conheço.', eg:'repositório público, ferramenta que outro time adotou, material que circula fora daqui'}
    ]},
 
-  {id:'ver', tag:'Verificação', weight:'Peso ×2', title:'Como você confere',
+  {id:'ver', tag:'Verificação', title:'Como você confere',
    hint:'Como você confere o que a IA produziu antes de aceitar?',
    options:[
-    {v:1, main:'Geralmente aceito e sigo — ou não uso IA no trabalho.'},
+    {v:1, main:'Geralmente aceito e sigo, ou não uso IA no trabalho.'},
     {v:2, main:'Leio com atenção e uso o meu julgamento, sem executar nem conferir contra nada.'},
     {v:3, main:'Confiro contra a realidade antes de usar.', eg:'rodo e testo; confiro o número na fonte; confirmo se a citação existe; valido a regra com quem é dono dela'},
     {v:4, main:'Tenho um crivo definido que aplico sempre, cobrindo o que costuma quebrar.', eg:'teste automatizado com casos de borda; rubrica de aceite; revisão cruzada combinada com alguém'},
     {v:5, main:'Esse crivo roda antes de chegar em mim: a própria IA o executa e só me chama quando passa.'}
    ]},
 
-  {id:'ctx', tag:'Contexto', weight:'Peso ×1', title:'O que a IA sabe do seu mundo',
+  {id:'ctx', tag:'Contexto', title:'O que a IA sabe do seu mundo',
    hint:'Como a IA que você usa fica sabendo das convenções, do histórico e das restrições do que você faz?',
    options:[
-    {v:1, main:'Não fica sabendo — explico do zero a cada conversa, ou não uso IA no trabalho.'},
+    {v:1, main:'Não fica sabendo, explico do zero a cada conversa, ou não uso IA no trabalho.'},
     {v:2, main:'Colo o contexto à mão em cada tarefa.', eg:'trechos de código, exemplos do padrão esperado, o documento de referência'},
     {v:3, main:'Tenho um contexto escrito e reutilizável que ela lê ou recebe sempre.', eg:'CLAUDE.md ou AGENTS.md no repositório; um doc de padrões; um projeto customizado no ChatGPT ou Claude'},
-    {v:4, main:'Tenho, mexi nele neste mês, e criei peças próprias que eu reuso.', eg:'templates de prompt, comandos, skills, rubricas'},
+    {v:4, main:'Tenho, trabalhei nele neste mês, e criei peças próprias que eu reuso.', eg:'templates de prompt, comandos, skills, rubricas'},
     {v:5, main:'Esse contexto é do time: fica num lugar comum, mais de uma pessoa mantém, e evolui a cada entrega.'}
    ]},
 
-  {id:'jul', tag:'Julgamento crítico', weight:'Peso ×1', title:'Quando ela erra bem escrito',
+  {id:'jul', tag:'Julgamento crítico', title:'Quando ela erra bem escrito',
    hint:'A IA erra com confiança — a resposta errada vem bem escrita. Como você lida com isso?',
    options:[
-    {v:1, main:'Na prática, se veio bem escrito e coerente, eu sigo — ou não uso IA no trabalho.'},
+    {v:1, main:'Na prática, se veio bem escrito e coerente, eu sigo ou não uso IA no trabalho.'},
     {v:2, main:'Já me queimei e agora desconfio, mas não tenho um jeito de saber onde ela erra.'},
     {v:3, main:'Sei onde ela costuma errar no meu domínio e olho ali primeiro.', eg:'número inventado, citação que não existe, regra de negócio ignorada, viés na amostra, código que roda e faz a coisa errada'},
     {v:4, main:'Escolho conscientemente o que não delego, e sei explicar o critério.', eg:'decisão de consequência alta, comunicação que precisa da minha voz, o julgamento que é a minha parte do trabalho'},
     {v:5, main:'Ajudo o time a enxergar essa fronteira, com exemplos do nosso contexto de onde delegar compensa e onde não.'}
    ]},
 
-  {id:'seg', tag:'Segurança e LGPD', weight:'Fora da soma', title:'Dado e ferramenta',
+  {id:'seg', tag:'Segurança e LGPD', title:'Dado e ferramenta',
    hint:'Como você trata dado e ferramenta ao usar IA no trabalho?',
    options:[
-    {v:1, main:'Não tenho critério definido — uso a ferramenta que está à mão com o dado que eu preciso.'},
+    {v:1, main:'Não tenho critério definido: uso a ferramenta que está à mão com o dado que eu preciso.'},
     {v:2, main:'Evito o obviamente sensível, mas não verifico se a ferramenta é homologada.'},
-    {v:3, main:'Uso ferramenta homologada e não coloco dado sensível em ferramenta que não é.', eg:'sensível = dado de aluno ou cliente, credencial, contrato, base de leads, código proprietário'},
+    {v:3, main:'Uso ferramenta homologada e não coloco dado sensível em ferramenta que não é.', eg:'sensível = dado de cliente, credencial, contrato, base de leads, código proprietário'},
     {v:4, main:'Além disso, penso em permissão e escopo antes de dar acesso a um agente.', eg:'o que ele pode ler, o que pode alterar, o que pode executar sozinho'},
     {v:5, main:'Ajudo a definir critério de homologação, escopo de acesso de agentes e política de uso para o time.'}
    ]},
 
-  {id:'papel', tag:'Papel', weight:'Não pontua', title:'O seu trabalho',
-   hint:'O que descreve melhor o seu trabalho no dia a dia?',
-   options:[
-    {v:'a', main:'Engenharia, dados ou infra', eg:'dev, SRE, engenheiro de dados, QA'},
-    {v:'b', main:'Produto ou negócio', eg:'PO, PM, analista de negócio, growth'},
-    {v:'c', main:'Design, UX, pesquisa ou conteúdo', eg:'designer, UX writer, pesquisador'},
-    {v:'d', main:'Suporte, operações ou sistemas', eg:'suporte técnico, sysadmin, ops'},
-    {v:'e', main:'Liderança ou gestão', eg:'tech lead, coordenação, gerência'}
-   ]},
 
-  {id:'bloq', tag:'Bloqueio', weight:'Até 2 · não pontua', title:'O que te segura hoje', multi:2,
+  {id:'bloq', tag:'Bloqueio', title:'O que te segura hoje', multi:2,
    hint:'O que mais te impede de usar IA mais ou melhor hoje? Marque até duas.',
    options:[
     {v:'a', main:'Falta de tempo para experimentar', eg:'a demanda não abre espaço para tentar de um jeito novo'},
     {v:'b', main:'Não sei o que é possível fazer', eg:'uso para o básico e desconfio que dá para muito mais'},
     {v:'c', main:'Não confio no resultado', eg:'reviso tanto que às vezes sai mais caro que fazer sozinho'},
     {v:'d', main:'Falta acesso ou ferramenta homologada', eg:'não tenho licença, ou não sei o que posso usar'},
+    {v:'h', main:'Acaba o meu limite de uso', eg:'os tokens ou os créditos terminam antes do fim do trabalho; espero renovar para continuar'},
     {v:'e', main:'A IA não conhece o nosso contexto', eg:'nossos sistemas, nossas regras, nosso histórico'},
     {v:'f', main:'Medo de errar publicamente', eg:'entregar algo gerado por IA com erro e isso pesar no meu nome'},
     {v:'g', main:'Nada me bloqueia hoje'}
@@ -179,6 +170,17 @@ function el(tag, cls, html){
   if (html != null) n.innerHTML = html;
   return n;
 }
+/* Fisher-Yates numa cópia. As alternativas aparecem fora da ordem de
+   maturidade de propósito: ordem crescente induz a resposta. */
+function shuffle(arr){
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
 function esc(s){
   return String(s).replace(/[&<>"]/g, function(c){
     return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];
@@ -196,28 +198,26 @@ function buildForm(){
     var tag = el('div','q-tag');
     tag.appendChild(el('span','n', String(i+1).padStart(2,'0')));
     tag.appendChild(el('span','', esc(q.tag)));
-    tag.appendChild(el('span','w', esc(q.weight)));
     sec.appendChild(tag);
 
     var h = el('h2', null, esc(q.title));
     h.id = 'h-'+q.id;
     sec.appendChild(h);
     sec.appendChild(el('p','hint', esc(q.hint)));
-    if (q.note) sec.appendChild(el('p','notice', esc(q.note)));
 
     var box = el('div','opts');
-    q.options.forEach(function(o, j){
+    shuffle(q.options).forEach(function(o, j){
       var lab = el('label', 'opt' + (q.multi ? ' box' : ''));
       lab.setAttribute('data-on','0');
+      lab.setAttribute('data-v', String(o.v));
       var input = document.createElement('input');
       input.type = q.multi ? 'checkbox' : 'radio';
       input.name = q.id;
       input.value = String(o.v);
-      input.id = q.id + '-' + j;
+      input.id = q.id + '-' + String(o.v);
       lab.appendChild(input);
       lab.appendChild(el('span','dot'));
       var txt = el('span','txt');
-      if (o.code) txt.appendChild(el('span','code', o.code));
       txt.appendChild(el('span','main', esc(o.main)));
       if (o.eg) txt.appendChild(el('span','eg', 'ex.: ' + esc(o.eg)));
       lab.appendChild(txt);
@@ -304,9 +304,10 @@ var BLOQ_TEXT = {
   a:'Falta de tempo é o bloqueio que menos se resolve com treinamento e mais com prioridade. Escolha uma tarefa recorrente e proteja uma hora por semana para refazê-la de outro jeito — o retorno aparece na terceira repetição.',
   b:'“Não sei o que é possível” é o bloqueio mais barato de remover e o de maior retorno: não é treinamento, é exposição. Ver um colega trabalhar por trinta minutos costuma valer mais que um curso.',
   c:'Desconfiança do resultado não se resolve confiando mais — se resolve com crivo. Quando existe algo que confere por você, a revisão para de ser leitura integral e vira exceção.',
-  d:'Falta de acesso é bloqueio de organização, não de pessoa. Vale escalar: é o único da lista que a sua própria dedicação não resolve.',
+  d:'Falta de acesso é bloqueio de organização, não de pessoa. Vale escalar: junto com o limite de uso, é o tipo de obstáculo que a sua própria dedicação não resolve.',
   e:'“A IA não conhece o nosso contexto” é exatamente o que um contexto escrito e reutilizável resolve — e é o degrau que separa uso individual de uso de time.',
   f:'Medo de errar publicamente é sinal de ambiente, não de pessoa. Onde o erro assistido por IA é tratado como erro comum, o uso avança; onde ele vira caso, todo mundo recua para o que é seguro.',
+  h:'Limite de uso é o bloqueio mais fácil de confundir com falta de maturidade: a pessoa sabe o que fazer, começou a fazer, e parou no meio por cota. Diferente dos outros da lista, ele tem preço conhecido e some no dia em que alguém decide pagá-lo — e enquanto não some, ele empurra o trabalho de volta para o modo antigo, que é onde a rotina trava.',
   g:'Você respondeu que nada te bloqueia. Vale cruzar isso com o seu nível: quando não há obstáculo externo e o nível ainda não é o que poderia ser, o que falta costuma ser repertório — ninguém sobe um degrau que nunca viu.'
 };
 
@@ -398,7 +399,8 @@ function render(a){
   if (a.bloq && a.bloq.length){
     h += '<h3 class="sec">Sobre o que você marcou como bloqueio</h3>';
     a.bloq.forEach(function(k){
-      var opt = QUESTIONS[8].options.filter(function(o){ return o.v === k; })[0];
+      var qb = QUESTIONS.filter(function(x){ return x.id === 'bloq'; })[0];
+      var opt = qb.options.filter(function(o){ return o.v === k; })[0];
       h += card('', opt.main, '<p>' + BLOQ_TEXT[k] + '</p>');
     });
   }
@@ -417,10 +419,9 @@ function render(a){
     '<p>A régua mede comportamento declarado, não capacidade demonstrada, e não tem validade psicométrica — o que ela herda das fontes é a arquitetura, não a validação. O resultado confiável é a distribuição de um grupo; o nível individual é ponto de partida de conversa.</p>' +
     '<p>Use para desenhar trilha, montar time misto e achar gargalo. Não use para comparar pessoas nem para justificar decisão sobre alguém.</p>');
 
-  h += '<div class="actions print-hide">';
-  h += '<button class="btn" type="button" id="pdf">Salvar em PDF</button> ';
+  h += '<div class="actions">';
   h += '<button class="btn ghost" type="button" id="again">Refazer</button>';
-  h += '<p class="sub">Nada foi enviado nem salvo. Para guardar, use o PDF.</p>';
+  h += '<p class="sub">Nada foi enviado nem salvo. Fechou a aba, acabou.</p>';
   h += '</div>';
 
   out.innerHTML = h;
@@ -430,9 +431,6 @@ function render(a){
   window.scrollTo(0,0);
   document.getElementById('again').addEventListener('click', function(){
     location.reload();
-  });
-  document.getElementById('pdf').addEventListener('click', function(){
-    window.print();
   });
 }
 

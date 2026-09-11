@@ -43,8 +43,8 @@ const server = http.createServer((req, res) => {
   page.on('pageerror', e => erros.push(e.message));
 
   await page.goto(url);
-  const pick = (q, i) => page.locator(`#q-${q} .opt`).nth(i).click();
-  for (const [q, i] of [['rot',4],['pic',4],['pro',3],['ver',3],['ctx',3],['jul',3],['seg',3],['papel',1],['bloq',0]]) await pick(q, i);
+  const pick = (q, v) => page.locator(`#q-${q} .opt[data-v="${v}"]`).click();
+  for (const [q, v] of [['rot',4],['pic',4],['pro',3],['ver',3],['ctx',3],['jul',3],['seg',3],['bloq','h']]) await pick(q, v);
   await page.click('#submit');
   await page.waitForSelector('#result.on', {timeout:5000});
 
@@ -62,10 +62,15 @@ const server = http.createServer((req, res) => {
       const f = document.querySelector('.dim .fill');
       return f && f.getBoundingClientRect().width > 4;
     }));
-  check('o botão de PDF existe sem handler inline',
+  check('nenhum handler de evento inline no documento',
     await page.evaluate(() => {
-      const b = document.getElementById('pdf');
-      return !!b && !b.getAttribute('onclick');
+      const attrs = ['onclick','onchange','onsubmit','onload','oninput'];
+      return !Array.from(document.querySelectorAll('*')).some(n => attrs.some(a => n.hasAttribute(a)));
+    }));
+  check('o crédito aponta para o LinkedIn do autor',
+    await page.evaluate(() => {
+      const a = document.querySelector('footer .credit a');
+      return !!a && a.href === 'https://www.linkedin.com/in/luanlima' && a.rel.includes('noopener');
     }));
 
   await browser.close();

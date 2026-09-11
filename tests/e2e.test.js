@@ -10,20 +10,13 @@ const t = async (nome, fn) => {
 const eq = (a, b, m) => { if (a !== b) throw new Error(`${m || ''} esperado ${JSON.stringify(b)}, obtido ${JSON.stringify(a)}`); };
 const ok = (c, m) => { if (!c) throw new Error(m || 'condição falsa'); };
 
-/* marca uma resposta pelo índice da opção (0-based) */
-async function pick(page, qid, idx){
-  await page.locator(`#q-${qid} .opt`).nth(idx).click();
+/* marca uma resposta pelo VALOR — a ordem das alternativas é aleatória */
+async function pick(page, qid, valor){
+  await page.locator(`#q-${qid} .opt[data-v="${valor}"]`).click();
 }
 async function fill(page, a){
-  await pick(page, 'rot', a.rot);          // índice = valor (0..6)
-  await pick(page, 'pic', a.pic);
-  await pick(page, 'pro', a.pro - 1);      // valores 1..5 → índices 0..4
-  await pick(page, 'ver', a.ver - 1);
-  await pick(page, 'ctx', a.ctx - 1);
-  await pick(page, 'jul', a.jul - 1);
-  await pick(page, 'seg', a.seg - 1);
-  await pick(page, 'papel', a.papel != null ? a.papel : 0);
-  for (const b of (a.bloq || [0])) await pick(page, 'bloq', b);
+  for (const k of ['rot','pic','pro','ver','ctx','jul','seg']) await pick(page, k, a[k]);
+  for (const b of (a.bloq || ['a'])) await pick(page, 'bloq', b);
 }
 
 (async () => {
@@ -37,17 +30,17 @@ async function fill(page, a){
     page.on('console', m => { if (m.type() === 'error') erros.push(m.text()); });
     await page.goto(URL);
 
-    await t('as 9 perguntas renderizam', async () => {
-      eq(await page.locator('.q').count(), 9);
+    await t('as 8 perguntas renderizam', async () => {
+      eq(await page.locator('.q').count(), 8);
     });
-    await t('todas as alternativas renderizam (7+7+5+5+5+5+5+5+7 = 51)', async () => {
-      eq(await page.locator('.opt').count(), 51);
+    await t('todas as alternativas renderizam (7+7+5+5+5+5+5+8 = 47)', async () => {
+      eq(await page.locator('.opt').count(), 47);
     });
     await t('a barra de progresso só aparece após a primeira resposta', async () => {
       ok(await page.locator('#bar').isHidden(), 'barra visível antes de responder');
       await pick(page, 'rot', 3);
       ok(await page.locator('#bar').isVisible(), 'barra não apareceu');
-      eq((await page.locator('#count').textContent()).trim(), '1 de 9');
+      eq((await page.locator('#count').textContent()).trim(), '1 de 8');
     });
     await t('submeter incompleto não mostra resultado e marca o que falta', async () => {
       await page.click('#submit');
@@ -56,11 +49,30 @@ async function fill(page, a){
       ok((await page.locator('#submit-sub').textContent()).includes('Falta'), 'sem aviso de faltantes');
     });
     await t('a múltipla escolha respeita o teto de 2', async () => {
-      for (const i of [0,1,2]) await pick(page, 'bloq', i);
+      for (const v of ['a','b','c']) await pick(page, 'bloq', v);
       eq(await page.locator('#q-bloq input:checked').count(), 2);
     });
     await t('nenhum erro de JS no console', async () => {
       eq(erros.length, 0, erros.join(' | '));
+    });
+    await t('nenhuma alternativa exibe código de nível (N0–N6)', async () => {
+      const txt = await page.locator('#form').textContent();
+      const achados = txt.match(/\bN[0-6]\s*—/g) || [];
+      eq(achados.length, 0, 'códigos encontrados: ' + achados.join(', '));
+      eq(await page.locator('.opt .code').count(), 0);
+    });
+    await t('nenhum peso é exibido nas perguntas', async () => {
+      const txt = (await page.locator('#form').textContent()).toLowerCase();
+      ok(!txt.includes('peso ×') && !txt.includes('pesa dobrado') && !txt.includes('não pontua'),
+        'menção a peso encontrada');
+    });
+    await t('não existe pergunta sobre papel ou cargo', async () => {
+      eq(await page.locator('#q-papel').count(), 0);
+      const txt = (await page.locator('#form').textContent()).toLowerCase();
+      ok(!txt.includes('o que descreve melhor o seu trabalho'), 'pergunta de papel presente');
+    });
+    await t('não existe campo de e-mail nem qualquer entrada de texto', async () => {
+      eq(await page.locator('input[type="email"], input[type="text"], textarea').count(), 0);
     });
     await page.close();
   }
@@ -92,7 +104,7 @@ async function fill(page, a){
   {
     const page = await browser.newPage();
     await page.goto(URL);
-    await fill(page, {rot:5,pic:5,pro:4,ver:2,ctx:4,jul:2,seg:2, bloq:[1,5]});
+    await fill(page, {rot:5,pic:5,pro:4,ver:2,ctx:4,jul:2,seg:2, bloq:['b','f']});
     await page.click('#submit');
     await page.waitForSelector('#result.on');
     const txt = await page.locator('#result').textContent();
@@ -125,13 +137,13 @@ async function fill(page, a){
     const page = await browser.newPage({viewport:{width:1000,height:1200}});
     await page.goto(URL);
     await t('a barra de progresso preenche conforme as respostas', async () => {
-      for (const [q,i] of [['rot',3],['pic',3],['pro',3]]) await pick(page,q,i);
+      for (const [q,v] of [['rot',3],['pic',3],['pro',3]]) await pick(page,q,v);
       await page.waitForTimeout(450);
       const w = await page.evaluate(() => {
         const f = document.getElementById('fill');
         return f.getBoundingClientRect().width / f.parentElement.getBoundingClientRect().width;
       });
-      ok(w > 0.28 && w < 0.39, `preenchimento de 3/9 fora do esperado: ${(w*100).toFixed(1)}%`);
+      ok(w > 0.32 && w < 0.44, `preenchimento de 3/8 fora do esperado: ${(w*100).toFixed(1)}%`);
     });
     await page.close();
   }
@@ -208,12 +220,12 @@ async function fill(page, a){
     const page = await browser.newPage();
     await page.goto(URL);
     await t('o formulário é navegável e marcável por teclado', async () => {
-      await page.locator('#q-rot input').nth(3).focus();
+      await page.locator('#q-rot .opt[data-v="3"] input').focus();
       await page.keyboard.press('Space');
       eq(await page.locator('#q-rot input:checked').count(), 1);
     });
     await t('cada grupo de pergunta tem rótulo acessível', async () => {
-      eq(await page.locator('[role="group"][aria-labelledby]').count(), 9);
+      eq(await page.locator('[role="group"][aria-labelledby]').count(), 8);
     });
     await t('a página declara o idioma', async () => {
       eq(await page.getAttribute('html', 'lang'), 'pt-BR');

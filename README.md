@@ -1,7 +1,12 @@
 # Régua de maturidade em IA
 
-Diagnóstico de maturidade no uso de IA no trabalho. Nove perguntas de escolha, escala única
+Diagnóstico de maturidade no uso de IA no trabalho. Oito perguntas de escolha, escala única
 N0–N6, sem bifurcação por papel. O resultado sai na hora, no navegador de quem responde.
+
+As alternativas são embaralhadas a cada carregamento e não exibem o código do nível a que
+correspondem. Ordem crescente de maturidade induz a resposta, e um rótulo `N4 —` ao lado da
+alternativa transforma a pergunta numa escolha de nota. Também não há pergunta de cargo nem
+coleta de e-mail: a página não identifica ninguém.
 
 **Nada é enviado, nada é salvo.** Sem back-end, sem banco, sem cookie, sem analytics, sem
 `localStorage`. A página é HTML e um arquivo JavaScript — o cálculo roda no cliente e o
@@ -9,7 +14,7 @@ resultado desaparece quando a aba fecha. Há teste automatizado verificando exat
 
 ## Como o nível é calculado
 
-Seis das nove perguntas viram pontos. Duas contam dobrado. A soma cai numa faixa, e cinco
+Seis das oito perguntas viram pontos. Duas contam dobrado. A soma cai numa faixa, e cinco
 limites podem baixá-la — nunca subi-la.
 
 ```
@@ -64,11 +69,20 @@ literal da fórmula em produção na planilha de respostas, varrendo exaustivame
 combinações possíveis de resposta, mais invariantes (nenhum limite pode ser violado em
 nenhuma combinação) e casos nomeados.
 
-**`tests/e2e.test.js`** — 35 verificações no navegador: renderização das nove perguntas,
+**`tests/e2e.test.js`** — 39 verificações no navegador: renderização das oito perguntas,
 validação de campos faltantes, teto de duas marcações na múltipla escolha, sete perfis
 calculados na tela, conteúdo do resultado, geometria e cor das barras, ausência total de
 requisição de rede / storage / cookie, ausência de rolagem horizontal em três larguras,
-e navegação por teclado.
+navegação por teclado, e as garantias de neutralidade — nenhum código de nível visível,
+nenhum peso exibido, nenhuma pergunta de cargo, nenhum campo de texto ou e-mail.
+
+**`tests/shuffle.test.js`** — 24 verificações em 12 carregamentos: a ordem das alternativas
+varia, nunca sai crescente em todos eles, e nenhuma alternativa se perde ou duplica no
+embaralhamento.
+
+**`tests/csp.test.js`** — sobe um servidor local com exatamente os headers do arquivo
+`_headers` e confere que a política não bloqueia nada: sem violação de CSP, sem handler de
+evento inline, resultado e barras renderizando.
 
 O fixture `tests/casos-reais.json` (respostas internas anonimizadas) não é versionado. Quando
 presente, o teste de score também confere a paridade contra os registros reais; quando ausente,
